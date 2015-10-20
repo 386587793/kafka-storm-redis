@@ -4,7 +4,7 @@
 ```shell
 flume-ng agent -c /xxx/conf -f /xxx/conf/f1.conf -n agent-1 > /xxx/logfile 2>&1 &
 ```
-### 配置文件
+### flume配置文件
 ```xml
 #flume-agent配置文件
 
@@ -38,7 +38,7 @@ agent1.sources.r1.interceptors.i2.preserveExisting=false
 agent1.sources.r1.channels = c1
 agent1.sinks.k1.channel = c1
 ```
-### kafkaspout
+### kafka
 ```shell
 # 启动 kafka
 nohup /usr/lib/kafka/kafka_2.11-0.8.2.1/bin/kafka-server-start.sh /usr/lib/kafka/kafka_2.11-0.8.2.1/config/server.properties >/dev/null 2>&1 &
@@ -52,4 +52,36 @@ nohup /usr/lib/kafka/kafka_2.11-0.8.2.1/bin/kafka-server-start.sh /usr/lib/kafka
 /usr/lib/kafka/kafka_2.11-0.8.2.1/bin/kafka-console-consumer.sh --zookeeper 192.168.1.102:2182,192.168.1.103:2182,192.168.1.104:2182 --topic test_topic_gn
 # 查看 client消费topic offset 
 /usr/lib/zookeeper3.4.6/zookeeper-3.4.6/bin/zkCli.sh -server 127.0.0.1:2182
+```
+##strom-kafka
+###kafkaspout
+```java
+public KafkaSpoutFactory(String topic, String spoutId, String[] zkServers,
+			Scheme scheme, String zkRoot, Integer zkPort) {
+		StringBuffer zkHosts =null;
+		
+		if (zkServers != null) {
+			zkHosts = new StringBuffer();
+			for (String s : zkServers) {
+				if (zkHosts.length() > 0)
+					zkHosts.append(",");
+				zkHosts.append(s);
+				zkHosts.append(":");
+				zkHosts.append(zkPort);
+			}
+		} else {
+			LOG.error("zkServers is null");
+			throw new IllegalArgumentException("zkServers not be null");
+		}
+		
+		this.brokerHosts = new ZkHosts(zkHosts.toString());
+		this.spoutConf = new SpoutConfig(this.brokerHosts, topic, zkRoot,spoutId);
+		this.spoutConf.scheme = new SchemeAsMultiScheme(scheme);
+		// 该配置是指，如果该Topology因故障停止处理，下次正常运行时是否从Spout对应数据源Kafka中的该订阅Topic的起始位置开始读取，如果forceFromStart=true，
+		// 则之前处理过的Tuple还要重新处理一遍，否则会从上次处理的位置继续处理，保证Kafka中的Topic数据不被重复处理，是在数据源的位置进行状态记录
+		spoutConf.forceFromStart = false;
+		this.spoutConf.zkServers = Arrays.asList(zkServers);
+		this.spoutConf.zkPort = zkPort;
+		this.kafkaSpout = new KafkaSpout(this.spoutConf);
+	}
 ```
