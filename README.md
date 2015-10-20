@@ -73,5 +73,3 @@ public KafkaSpoutFactory(String topic, String spoutId, String[] zkServers,
 	}
 ```
 ## storm-redis
-
-

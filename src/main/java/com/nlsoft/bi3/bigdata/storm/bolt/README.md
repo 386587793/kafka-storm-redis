@@ -7,8 +7,8 @@
 把map结构数据存入redis
 ## MultiRedisStoreBolt
 支持五种基本redis数据结构：
-String
-List
-Set
-Sort-set
-Hash
+- String
+- List
+- Set
+- Sort-set
+- Hash
