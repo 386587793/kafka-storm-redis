@@ -55,25 +55,12 @@ nohup /usr/lib/kafka/kafka_2.11-0.8.2.1/bin/kafka-server-start.sh /usr/lib/kafka
 ```
 ##strom-kafka
 ###kafkaspout
+传入订阅的topic,zk保存的clientId,zookeeper server,默认的StringScheme,zookeeper 目录,zookeeper port
 ```java
 public KafkaSpoutFactory(String topic, String spoutId, String[] zkServers,
 			Scheme scheme, String zkRoot, Integer zkPort) {
 		StringBuffer zkHosts =null;
-		
-		if (zkServers != null) {
-			zkHosts = new StringBuffer();
-			for (String s : zkServers) {
-				if (zkHosts.length() > 0)
-					zkHosts.append(",");
-				zkHosts.append(s);
-				zkHosts.append(":");
-				zkHosts.append(zkPort);
-			}
-		} else {
-			LOG.error("zkServers is null");
-			throw new IllegalArgumentException("zkServers not be null");
-		}
-		
+		……
 		this.brokerHosts = new ZkHosts(zkHosts.toString());
 		this.spoutConf = new SpoutConfig(this.brokerHosts, topic, zkRoot,spoutId);
 		this.spoutConf.scheme = new SchemeAsMultiScheme(scheme);
@@ -85,3 +72,6 @@ public KafkaSpoutFactory(String topic, String spoutId, String[] zkServers,
 		this.kafkaSpout = new KafkaSpout(this.spoutConf);
 	}
 ```
+## storm-redis
+
+
