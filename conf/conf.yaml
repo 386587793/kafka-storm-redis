@@ -1,0 +1,72 @@
+nimbus.host: hadoop01
+# netty连接超时设置
+storm.messaging.netty.max_retries: 300
+storm.messaging.netty.max_wait_ms: 4000
+# topo配置
+# 拓扑名
+topology.name: test-storm-kafka
+# 集群执行此拓扑的worker数量
+topology.workers: 12
+# 消息超时时间
+topology.message.timeout.secs: 150
+# 当设置为0时,相当于禁用了消息可靠性,storm会在spout发送tuples后立即进行确认.
+#topology.acker.executors: 0
+# 是否打印日志
+topology.isdebug: false
+#一个spout task中处于pending状态的最大的tuples数量.该配置应用于单个task,而不是整个spouts或topology.
+#topology.max.spout.pending: 5000
+# gn-kafka-spout
+gn.kafka.spout.id: spout-0-0-gn-kafka
+gn.kafka.spout.topic.name: test_topic_gn_03
+gn.kafka.spout.topic.client.id: test_topic_gn_client_id_03_00
+gn.kafka.spout.parallelism.hint: 3
+#gn.kafka.spout.num.tasks: 2
+# msg2hashMap-bolt
+msg.to.hashmap.bolt.id: bolt-1-0-msg2hashMap
+msg.to.hashmap.bolt.parallelism.hint: 1
+msg.to.hashmap.bolt.num.tasks: 3
+msg.to.hashmap.bolt.grouping: spout-0-0-gn-kafka
+# hmset2redis-bolt
+hmset.to.redis.bolt.id: bolt-2-0-hmset2redis
+hmset.to.redis.bolt.parallelism.hint: 8
+hmset.to.redis.bolt.num.tasks: 32
+hmset.to.redis.bolt.grouping: bolt-1-0-msg2hashMap 
+# 数据格式
+#a.data.split.str: ,
+#a.data.schema.fileds: START_TIME,IMSI,IMEI,EVENT_TYPE,DURATION,START_LAC,START_CI,END_LAC,END_CI,SOUR_LAC,SOUR_CI,DEST_LAC,DEST_CI,CAUSE,HLR,VLR,MSISDN,OPPO_NUM,OTHER_NUM,RES2
+gn.data.split.str: "\\|"
+gn.data.schema.fileds: MSISDN,DELAY,LAC,CI,IMEI,FLOW_TYPE,START_TIME,END_TIME,DURATION,UP_BYTES,DOWN_BYTES,TOTAL_BYTES,RAT_TYPE,TERMINAL_IP,VISIT_IP,STATUS,USER_AGENT,APN,IMSI,SGSNIP,GGSNIP,CONTENT_TYPE,SOURCE_PORT,DES_PORT,RECORD_MARK,MERGE_COUNT,HOST,URL
+# zookeeper配置
+storm.zookeeper.servers:
+     - "hadoop02"
+     - "hadoop03"
+     - "hadoop04"
+storm.zookeeper.servers.ip:
+     - "192.168.1.102"
+     - "192.168.1.103"
+     - "192.168.1.104"
+storm.zookeeper.port: 2182
+storm.zookeeper.root: /storm
+storm.zookeeper.session.timeout: 20000
+storm.zookeeper.connection.timeout: 15000
+storm.zookeeper.retry.times: 5
+storm.zookeeper.retry.interval: 1000
+storm.zookeeper.retry.intervalceiling.millis: 30000
+# kafka配置
+kafka.topic.zookeeper.root: /kafka-topic
+# hadoop配置
+#hadoop.dfs.cluster: mycluster
+#file.input.path: /bigData/storm/testdata
+#hdfs.bolt.file.output.path: /bigData/storm/output
+fs.reader: HDFS
+# Redis 配置
+redis.cluster.nodes.size: 6
+redis.cluster.nodes.hostandport:
+     - "192.168.1.101:7001"
+     - "192.168.1.101:7002"
+     - "192.168.1.101:7003"
+     - "192.168.1.101:8001"
+     - "192.168.1.101:8002"
+     - "192.168.1.101:8003"
+redis.cluster.connect.timeout: 15000
+redis.cluster.connect.max_redirections: 100
